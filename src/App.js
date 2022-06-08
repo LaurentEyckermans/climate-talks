@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState,useEffect } from "react";
 import Logo from './components/Logo';
 import Input from './components/Input';
 import Post from './components/Post';
@@ -9,13 +9,46 @@ import styled from 'styled-components';
 function App() {
 
   
+  const [data, setData] = useState([]);
+  const [postsArr, setPostsArr] = useState([])
+  const [inputs, setInputs] = useState({})
+    
+  const fetchData = async () => {
+    try {
+     const result = await fetch(`https://jsonplaceholder.typicode.com/posts`);
+     const body = await result.json();
+     setData(body);
+    } catch(err) {
+      // error handling code
+    } 
+  }
+  useEffect(() => {
+      fetchData()
+    
+    }, [])
+
+  useEffect(()=>{
+      // console.log(data[0])
+      setPostsArr(data.slice(8,20))
+  },[data])
 
 
-  // useEffect(() =>{
+  function storeMyValue(value) {
+    // console.log("storeMy" +value)
+    setInputs(inputs => ({ ...inputs, ...value }))
+    // console.log(inputs)
+    // console.log(postsArr)
+  }
 
-  //   fetchMyDefaultData()
-  // },[]);
-
+  function createPost() {
+    console.log("createPost")
+    const newPostsArr = [...postsArr]
+    newPostsArr.unshift({userId:"a", id:null, title:inputs.title, body:inputs.content})
+    // setInputs(inputs => ({title:inputs.title, body:inputs.content}))
+    // setPostsArr(postsArr.push(inputs))
+    setPostsArr(newPostsArr)
+    // console.log(newPostsArr)
+  }
 
   return (
 
@@ -39,10 +72,10 @@ function App() {
         </AboutAndAnim3D>
         <InputAndMessage>
           <Inputs>
-            <Input title={"title"} placeholder={"title"} widthBar={'100px'}></Input>
+            <Input title={"title"} placeholder={"title"} widthBar={'100px'} storeValue={storeMyValue}></Input>
             <InputAndSend>
-              <Input title={"content"} placeholder={"content"}></Input>
-              <Butt svg={4}></Butt>
+              <Input title={"content"} placeholder={"content"} storeValue={storeMyValue}></Input>
+              <Butt svg={4} send={createPost}></Butt>
             </InputAndSend>
           </Inputs>
           <Message>
@@ -51,15 +84,9 @@ function App() {
         </InputAndMessage>
         <Posts>
           <GroupPosts>
-            <Post></Post>
-            <Post></Post>
-            <Post></Post>
-            <Post></Post>
-            <Post></Post>
-            <Post></Post>
-            <Post></Post>
-            <Post></Post>
-            <Post></Post>
+            {postsArr.map((post)=>
+              <Post title={post.title} body={post.body} userId={post.userId==="a"?"a":post.userId}></Post>
+            )}
           </GroupPosts>
         </Posts>
 
@@ -185,7 +212,7 @@ const Posts = styled.div`
   /* Track */
 ::-webkit-scrollbar-track {
   width:2px;
-  background: grey;
+  background: transparent;
   // opacity:0.5;
 }
   /* Handle */

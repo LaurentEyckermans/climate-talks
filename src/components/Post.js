@@ -1,18 +1,59 @@
+import { useState, useEffect } from 'react'
 import React from 'react'
 import styled from 'styled-components'
 import Butt from './buttons/Butt'
 
 export default function Post(props) {
+    const [userName, setUserName] = useState("")
+
+    function getRandomInt(max) {
+        return Math.floor(Math.random() * max);
+
+    }
+
+ 
+
+    
+
+    useEffect(() => {
+       
+        async function fetchMyUser() {
+            if (props.userId === "a") {
+                setUserName("Admin")
+            } else {
+                try {
+                    const result = await fetch(`https://jsonplaceholder.typicode.com/users/${props.userId}`);
+                    const body = await result.json();
+                    // console.log(body)
+                    setUserName(body.name);
+                } catch (err) {
+                    // error handling code
+                }
+            }
+        }
+        fetchMyUser()
+
+    }, [])
+
+    useEffect(()=>{
+           if (props.userId === "a") {
+        setUserName("Admin")
+    }
+    })
+
+
     return (
         <Container>
             <UpContainer>
                 <UserAndPicture>
-                    <Picture></Picture>
-                    <UserName>user</UserName>
+                    <Picture>
+                        <img width={'28px'} height={'28px'} style={{ backgroundSize: "cover", borderRadius: "50%" }} src={`https://picsum.photos/200/${getRandomInt(100)}`} alt=''></img>
+                    </Picture>
+                    <UserName>{userName}</UserName>
                 </UserAndPicture>
                 <TitleAndContent>
-                    <Title>Title</Title>
-                    <Content>Lorem</Content>
+                    <Title>{props.title}</Title>
+                    <Content>{props.body}</Content>
                 </TitleAndContent>
                 <Delete>
                     <Butt svg={3}></Butt>
@@ -33,13 +74,16 @@ const Container = styled.div`
     flex-direction: column;
     justify-content: space-between;
     padding: 10px;
-    height: 120px;
+    height: 150px;
     width: 400px;
     background: linear-gradient(90deg, #576074 0%, rgba(0, 51, 72, 0.63) 0.01%, rgba(56, 119, 99, 0.29) 55.21%, rgba(0, 51, 72, 0.15) 100%);
     box-shadow: -5px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 10px;
     color:white;
     font-family: 'Quicksand';
+    
+
+
 `
 const UpContainer = styled.div`
     display: flex;
@@ -59,9 +103,10 @@ const Picture = styled.div`
 `
 
 const UserName = styled.div`
+    width: 60px;
 
 `
-const TitleAndContent = styled.div `
+const TitleAndContent = styled.div`
     display:flex;
     flex-direction:column;
     justify-content: left;
@@ -70,9 +115,66 @@ const TitleAndContent = styled.div `
     
 `
 const Title = styled.h3`
+    height:20px;
+::-webkit-scrollbar {
 
+    -webkit-appearance: none;
+
+    width: 2px;
+
+    height: 2px
+    
+
+}
+
+  /* Track */
+::-webkit-scrollbar-track {
+  width:2px;
+  background: transparent;
+  // opacity:0.5;
+}
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+   width: 2px;
+    background: white;
+  }
+    overflow-x: scroll;
+    overflow-y: hidden;
+    overflow-wrap: break-word;
+    white-space: nowrap;
+    /*firefox scrollBStyle*/
+    scrollbar-color: white;
+    scrollbar-width: thin;
+    
 `
 const Content = styled.div`
+  height: 60px;
+  overflow-y: scroll;
+  ::-webkit-scrollbar {
+
+    -webkit-appearance: none;
+
+    width: 2px;
+
+    height: 2px
+    
+
+}
+
+  /* Track */
+::-webkit-scrollbar-track {
+  width:2px;
+  background: transparent;
+  // opacity:0.5;
+}
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+   width: 2px;
+    background: white;
+  }
+  /*firefox scrollBStyle*/
+  scrollbar-color: white;
+  scrollbar-width: thin;
 
 `
 const Delete = styled.div`
@@ -81,4 +183,5 @@ const Delete = styled.div`
 const Buttons = styled.div`
     display:flex;
     justify-content: space-between;
+    // padding-top: 5px;
 `
