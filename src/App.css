@@ -1,0 +1,12 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+@font-face {
+  font-family: 'Poetsen One Regular';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Poetsen One Regular'), url('PoetsenOne-Regular.woff') format('woff');
+  }
