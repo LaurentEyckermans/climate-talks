@@ -5,13 +5,15 @@ import Butt from './buttons/Butt'
 
 export default function Post(props) {
     const [userName, setUserName] = useState("")
+    const [visible, setVisible] = useState("hidden")
+    const [edit, setEdit] = useState("")
+    const [myDataS, setMyDataS] = useState("")
 
     function getRandomInt(max) {
         return Math.floor(Math.random() * max);
-
     }
 
- 
+
 
     
 
@@ -33,13 +35,29 @@ export default function Post(props) {
         }
         fetchMyUser()
 
-    }, [])
+    }, [props.userId])
 
     useEffect(()=>{
            if (props.userId === "a") {
         setUserName("Admin")
     }
-    })
+    }, [props.userId])
+
+
+  async function editContent (){
+        // setEdit(!edit)
+       await props.dataS(myDataS)
+        console.log(myDataS)
+       await props.finish(edit)
+        console.log(edit)
+        setVisible(visible === "hidden" ? "visible": "hidden")       
+    }
+
+    function onChangeFct (e) {
+        setEdit(e.target.value)
+        
+        setMyDataS(e.target.attributes.dataSet.value)
+    }
 
 
     return (
@@ -53,7 +71,9 @@ export default function Post(props) {
                 </UserAndPicture>
                 <TitleAndContent>
                     <Title>{props.title}</Title>
-                    <Content>{props.body}</Content>
+                    <Content>{visible==="hidden"?props.body:""}
+                        <textarea dataSet={props.title} style={{visibility: visible, background: "transparent", outline: "none", color: "white", height:"60px"}} onChange={onChangeFct}>{props.body}</textarea>
+                    </Content>
                 </TitleAndContent>
                 <Delete>
                     <Butt svg={3}></Butt>
@@ -62,7 +82,7 @@ export default function Post(props) {
             <Buttons>
                 <Butt svg={0}></Butt>
                 <Butt svg={2}></Butt>
-                <Butt svg={1}></Butt>
+                <Butt svg={1} edit={editContent}></Butt>
             </Buttons>
         </Container>
     )
