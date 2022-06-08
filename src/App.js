@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Logo from './components/Logo';
 import Input from './components/Input';
 import Post from './components/Post';
@@ -8,29 +8,45 @@ import styled from 'styled-components';
 
 function App() {
 
-  
+
   const [data, setData] = useState([]);
   const [postsArr, setPostsArr] = useState([])
   const [inputs, setInputs] = useState({})
-    
-  const fetchData = async () => {
-    try {
-     const result = await fetch(`https://jsonplaceholder.typicode.com/posts`);
-     const body = await result.json();
-     setData(body);
-    } catch(err) {
-      // error handling code
-    } 
-  }
-  useEffect(() => {
-      fetchData()
-    
-    }, [])
+  const [dataS, setDataS] = useState("")
 
-  useEffect(()=>{
-      // console.log(data[0])
-      setPostsArr(data.slice(8,20))
-  },[data])
+
+
+  const fetchData = async () => {
+    // let storedData = JSON.parse(localStorage.getItem("my-posts"));
+    // console.log(storedData) 
+    // if(storedData!=null){
+    //   setData(storedData)
+    // }else{
+    try {
+      const result = await fetch(`https://jsonplaceholder.typicode.com/posts`);
+      const body = await result.json();
+      setData(body);
+      //  setPostsArr(data.slice(8,20))
+    } catch (err) {
+      // error handling code
+    }
+
+
+  }
+
+  useEffect(() => {
+    fetchData()
+
+  }, [])
+
+
+
+  useEffect(() => {
+    // console.log(data[0])
+    setPostsArr(data.slice(8, 20))
+  }, [data])
+
+
 
 
   function storeMyValue(value) {
@@ -43,11 +59,65 @@ function App() {
   function createPost() {
     console.log("createPost")
     const newPostsArr = [...postsArr]
-    newPostsArr.unshift({userId:"a", id:null, title:inputs.title, body:inputs.content})
+    newPostsArr.unshift({ userId: "a", id: null, title: inputs.title, body: inputs.content })
+
+    fetch('https://jsonplaceholder.typicode.com/posts', {
+      method: 'POST',
+      body: JSON.stringify({
+        userId: "a", id: null, title: inputs.title, body: inputs.content
+      }),
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+      },
+    })
+      .then((response) => response.json())
+      .then((json) => console.log(json));
     // setInputs(inputs => ({title:inputs.title, body:inputs.content}))
     // setPostsArr(postsArr.push(inputs))
     setPostsArr(newPostsArr)
     // console.log(newPostsArr)
+    localStorage.setItem("my-posts", JSON.stringify(postsArr));
+  }
+
+  function updateArr(arr) {
+    setPostsArr(arr)
+  }
+
+  function updatePost(value) {
+    console.log(value)
+    let myIndex = postsArr.indexOf(postsArr.find(element => element.title === dataS))
+    console.log(myIndex)
+    if (myIndex >= 0) {
+      fetch(`https://jsonplaceholder.typicode.com/posts/${myIndex}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          title: inputs.title, body: value
+        }),
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        },
+      })
+        .then((response) => response.json())
+        .then((json) => console.log(json));
+      const newPostsArr = [...postsArr]
+      newPostsArr.splice(myIndex, 1, { title: inputs.title, body: value })
+      updateArr(newPostsArr)
+    }
+  }
+
+  function deleteFct(){
+    //DeleteFCT
+
+    fetch('https://jsonplaceholder.typicode.com/posts/1', {
+      method: 'DELETE',
+    });
+
+  }
+
+
+
+  function myDataS(val) {
+    setDataS(val)
   }
 
   return (
@@ -84,8 +154,8 @@ function App() {
         </InputAndMessage>
         <Posts>
           <GroupPosts>
-            {postsArr.map((post)=>
-              <Post title={post.title} body={post.body} userId={post.userId==="a"?"a":post.userId}></Post>
+            {postsArr.map((post) =>
+              <Post title={post.title} body={post.body} userId={post.userId === "a" ? "a" : post.userId} finish={updatePost} dataS={myDataS}></Post>
             )}
           </GroupPosts>
         </Posts>
@@ -138,6 +208,8 @@ const UPicture = styled.div`
   border: 1px dashed #FFFFFF;
   height: 74px;
   width: 74px;
+  background-image: url("https://picsum.photos/200/400");
+  background-size: cover 70px;
 `
 const Content = styled.div`
   display: flex;
